@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
     
@@ -18,13 +18,21 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install --upgrade pip
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
     
     - name: Run migrations
       env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        DEBUG: False
+        ALLOWED_HOSTS: localhost,127.0.0.1
       run: python manage.py migrate --noinput
     
-    - name: Collect static
+    - name: Run collectstatic
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        DEBUG: False
+        ALLOWED_HOSTS: localhost,127.0.0.1
       run: python manage.py collectstatic --noinput
